@@ -22,13 +22,13 @@ entity_table* new_entity_table(entity_table* parent) {
     et->parent = parent;
     da_init(et, 1);
 
-    et->alloca = arena_make(10*sizeof(entity));
+    et->alloca = arena_make(10*sizeof(Entity));
     
     da_append(&entity_tables, et);
     return et;
 }
 
-entity* search_for_entity(entity_table* et, string ident) {
+Entity* search_for_entity(entity_table* et, string ident) {
     if (et == NULL) return NULL;
     
     // for now, its linear search bc im too lazy to impl a hashmap
@@ -41,9 +41,9 @@ entity* search_for_entity(entity_table* et, string ident) {
     return search_for_entity(et->parent, ident);
 }
 
-entity* new_entity(entity_table* et, string ident, AST decl) {
-    entity* e = arena_alloc(&et->alloca, sizeof(entity), alignof(entity));
-    *e = (entity){0};
+Entity* new_entity(entity_table* et, string ident, AST decl) {
+    Entity* e = arena_alloc(&et->alloca, sizeof(Entity), alignof(Entity));
+    *e = (Entity){0};
     e->identifier = ident;
     e->decl = decl;
     e->top = et;

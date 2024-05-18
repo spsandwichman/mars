@@ -7,11 +7,11 @@
 #include "parse.h"
 #include "type.h"
 
-typedef struct entity entity;
+typedef struct Entity Entity;
 typedef struct entity_table_list entity_table_list;
 typedef struct entity_table entity_table;
 
-typedef struct entity {
+typedef struct Entity {
     string identifier;
     AST decl; // If it's NULL_AST, it hasn't been declared yet.
 
@@ -44,7 +44,7 @@ typedef struct entity {
 
     bool checked : 1;
     bool visited : 1; // for cyclic dependency checking
-} entity;
+} Entity;
 
 typedef struct entity_table_list {
     entity_table** at;
@@ -56,7 +56,7 @@ typedef struct entity_table {
     entity_table* parent;
     arena alloca;
 
-    entity** at;
+    Entity** at;
     size_t len;
     size_t cap;
 } entity_table;
@@ -67,5 +67,5 @@ u64 FNV_1a(string key); // for implementing a hash table later
 
 entity_table* new_entity_table(entity_table* parent);
 
-entity* search_for_entity(entity_table* et, string ident);
-entity* new_entity(entity_table* et, string ident, AST decl);
+Entity* search_for_entity(entity_table* et, string ident);
+Entity* new_entity(entity_table* et, string ident, AST decl);

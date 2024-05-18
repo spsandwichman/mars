@@ -15,7 +15,7 @@ const size_t ast_type_size[] = {
 
 char* ast_type_str[] = {
     "invalid",
-#define AST_TYPE(ident, identstr, structdef) identstr,
+#define AST_TYPE(ident, enumident, structdef) #ident,
     AST_NODES
 #undef AST_TYPE
     "COUNT",

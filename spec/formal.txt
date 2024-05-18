@@ -264,13 +264,14 @@ control flow: (anywhere {} is used, a 'do stmt;' pattern can also be used);
     case const_expr: // each case has its own scope and implicit break
     case const_expr, ..., const_expr:
     case const_expr: fallthrough; // explicit fallthrough
+    case:
     }
 
     // compile-time switch: each scope is the same as the outside scope
     which expr {
     case const_expr: // implicit break
     case const_expr, ..., const_expr: // multiple cases in one
-    case const_expr: fallthrough; // explicit fallthrough
+    case:
     }
 
     NOTES:

@@ -172,7 +172,7 @@ void ir_generate_stmt_return(IR_Function* f, IR_BasicBlock* bb, AST ast) {
     // return values from the return variables
     if (astret->returns.len == 0) {
         for_urange(i, 0, astret->returns.len) {
-            entity* e = f->returns[i]->e;
+            Entity* e = f->returns[i]->e;
             IR* stackalloc = e->stackalloc;
 
             IR* load = ir_add(bb, ir_make_load(f, stackalloc, false));
@@ -237,7 +237,7 @@ IR_Function* ir_generate_function(IR_Module* mod, AST ast) {
 
 
         // store the entity's stackalloc
-        entity* e = astfunc->params[i];
+        Entity* e = astfunc->params[i];
         e->stackalloc = stackalloc;
     }
 
@@ -266,7 +266,7 @@ IR_Function* ir_generate_function(IR_Module* mod, AST ast) {
         store->T = make_type(TYPE_NONE);
 
         // store the entity's stackalloc
-        entity* e = astfunc->returns[i];
+        Entity* e = astfunc->returns[i];
         e->stackalloc = stackalloc;
     }
 

@@ -46,7 +46,7 @@ void ir_set_func_params(IR_Function* f, u16 count, ...) {
         if (!item) CRASH("item malloc failed");
         
         if (!no_set) {
-            item->e = va_arg(args, entity*);
+            item->e = va_arg(args, Entity*);
             if (item->e == NULL) {
                 no_set = true;
             }
@@ -74,7 +74,7 @@ void ir_set_func_returns(IR_Function* f, u16 count, ...) {
         if (!item) CRASH("item malloc failed");
         
         if (!no_set) {
-            item->e = va_arg(args, entity*);
+            item->e = va_arg(args, Entity*);
             if (item->e == NULL) {
                 no_set = true;
             }

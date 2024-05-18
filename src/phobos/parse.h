@@ -38,10 +38,10 @@ AST parse_atomic_expr   (parser* p, bool no_tcl);
 #define parse_type_expr(p) (parse_unary_expr((p), true))
 #define parse_expr(p, no_cl) (parse_binary_expr(p, 0, no_cl))
 
-#define current_token ((p)->tokens.at[(p)->current_tok])
-#define peek_token(n) ((p)->tokens.at[(p)->current_tok + (n)])
-#define advance_token (((p)->current_tok + 1 < (p)->tokens.len) ? ((p)->current_tok)++ : 0)
-#define advance_n_tok(n) (((p)->current_tok + n < (p)->tokens.len) ? ((p)->current_tok)+=n : 0)
+#define current_token(p) ((p)->tokens.at[(p)->current_tok])
+#define peek_token(p, n) ((p)->tokens.at[(p)->current_tok + (n)])
+#define advance_token(p) (((p)->current_tok + 1 < (p)->tokens.len) ? ((p)->current_tok)++ : 0)
+#define advance_n_tok(p, n) (((p)->current_tok + n < (p)->tokens.len) ? ((p)->current_tok)+=n : 0)
 
 #define str_from_tokens(start, end) ((string){(start).raw, (end).raw - (start).raw + (end).len})
 

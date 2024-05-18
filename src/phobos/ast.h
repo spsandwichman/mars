@@ -11,215 +11,216 @@ typedef struct {
     Token* start;
     Token* end;
     // type* T; /* tentatively deleting this, it may be useful in the future but not now */
-} ast_base;
+} AstBase;
 
-// define all the AST node macros
+// define all the Ast node macros
 #define AST_NODES \
-    AST_TYPE(identifier_expr, "identifier", { \
+    AST_TYPE(IdentExpr, IDENT, { \
         union { \
-        ast_base base; \
-        Token* tok; \
+            AstBase base; \
+            Token* tok; \
         }; \
         struct entity* entity; \
         bool is_discard : 1; \
     }) \
-    AST_TYPE(literal_expr, "literal", { \
-        ast_base base; \
+    AST_TYPE(LitExpr, LIT_EXPR, { \
+        AstBase base; \
         exact_value value; \
     }) \
-    AST_TYPE(comp_literal_expr, "compound literal", { \
-        ast_base base; \
-        AST type; \
-        da(AST) elems; \
+    AST_TYPE(CompoundLitExpr, COMPOUND_LIT_EXPR, { \
+        AstBase base; \
+        Ast type; \
+        da(Ast) elems; \
     }) \
-    AST_TYPE(func_literal_expr, "function literal", { \
-        ast_base base; \
-        AST type; \
-        AST code_block; \
+    AST_TYPE(FunctionLitExpr, FUNCTION_LIT_EXPR, { \
+        AstBase base; \
+        Ast type; \
+        Ast code_block; \
         \
         /* this is filled out by the checker */ \
-        struct entity** params;\
-        struct entity** returns;\
+        struct Entity** params;\
+        struct Entity** returns;\
         u16 paramlen;\
         u16 returnlen;\
     }) \
-    AST_TYPE(paren_expr, "parenthesis", { \
-        ast_base base; \
-        AST subexpr; \
+    AST_TYPE(ParenExpr, PAREN_EXPR, { \
+        AstBase base; \
+        Ast subexpr; \
     }) \
-    AST_TYPE(cast_expr, "cast", { \
-        ast_base base; \
-        AST type; \
-        AST rhs; \
+    AST_TYPE(CastExpr, CAST_EXPR, { \
+        AstBase base; \
+        Ast type; \
+        Ast rhs; \
         bool is_bitcast : 1; \
     }) \
-    AST_TYPE(unary_op_expr, "unary op", { \
-        ast_base base; \
+    AST_TYPE(UnaryOpExpr, UNARY_OP_EXPR, { \
+        AstBase base; \
         Token* op; \
-        AST inside; \
+        Ast inside; \
     }) \
-    AST_TYPE(binary_op_expr, "binary op", { \
-        ast_base base; \
+    AST_TYPE(BinaryOpExpr, BINARY_OP_EXPR, { \
+        AstBase base; \
         Token* op; \
-        AST lhs; \
-        AST rhs; \
+        Ast lhs; \
+        Ast rhs; \
     }) \
-    AST_TYPE(entity_selector_expr, "entity selector", { \
-        ast_base base; \
-        AST lhs; \
-        AST rhs; \
+    AST_TYPE(EntitySelectorExpr, ENTITY_SELECTOR_EXPR, { \
+        AstBase base; \
+        Ast lhs; \
+        Ast rhs; \
     }) \
-    AST_TYPE(selector_expr, "selector", { \
-        ast_base base; \
-        AST lhs; \
-        AST rhs; \
+    AST_TYPE(SelectorExpr, SELECTOR_EXPR, { \
+        AstBase base; \
+        Ast lhs; \
+        Ast rhs; \
         u32 field_index; /* filled out by checker */ \
     }) \
-    AST_TYPE(return_selector_expr, "return selector", { \
-        ast_base base; \
-        AST lhs; \
-        AST rhs; \
+    AST_TYPE(ReturnSelectorExpr, RETURN_SELECTOR_EXPR, { \
+        AstBase base; \
+        Ast lhs; \
+        Ast rhs; \
     }) \
-    AST_TYPE(impl_selector_expr, "implicit selector", { \
-        ast_base base; \
-        AST rhs; \
+    AST_TYPE(ImplSelectorExpr, IMPL_SELECTOR_EXPR, { \
+        AstBase base; \
+        Ast rhs; \
     }) \
-    AST_TYPE(index_expr, "array index", { \
-        ast_base base; \
-        AST lhs; \
-        AST inside; \
+    AST_TYPE(IndexExpr, INDEX_EXPR, { \
+        AstBase base; \
+        Ast lhs; \
+        Ast inside; \
     }) \
-    AST_TYPE(slice_expr, "slice", { \
-        ast_base base; \
-        AST lhs; \
-        AST inside_left; \
-        AST inside_right; \
+    AST_TYPE(SliceExpr, SLICE_EXPR, { \
+        AstBase base; \
+        Ast lhs; \
+        Ast inside_left; \
+        Ast inside_right; \
     }) \
-    AST_TYPE(call_expr, "call", { \
-        ast_base base; \
-        AST lhs; \
-        da(AST) params; \
+    AST_TYPE(CallExpr, CALL_EXPR, { \
+        AstBase base; \
+        Ast lhs; \
+        da(Ast) params; \
         bool force_inline; \
     }) \
+    AST_TYPE(RangeExpr, RANGE_EXPR, { \
+        AstBase base; \
+        Ast lhs; \
+        Ast rhs; \
+        bool inclusive; \
+    }) \
+    AST_TYPE(BasicForPattern, BASIC_FOR_PATTERN, { \
+        AstBase base; \
+        Ast prelude; \
+        Ast condition; \
+        Ast iteration; \
+    })\
+    AST_TYPE(RangedForPattern, RANGED_FOR_PATTERN, { \
+        AstBase base; \
+        Ast index; \
+        Ast range; \
+    })\
     \
     \
     AST_TYPE(module_decl, "module declaration", { \
-        ast_base base; \
+        AstBase base; \
         Token* name; \
     }) \
     AST_TYPE(import_stmt, "import statement", { \
-        ast_base base; \
-        AST name; \
-        AST path; \
+        AstBase base; \
+        Ast name; \
+        Ast path; \
         \
         string realpath; \
     }) \
     AST_TYPE(block_stmt, "statement block", { \
-        ast_base base; \
-        da(AST) stmts; \
+        AstBase base; \
+        da(Ast) stmts; \
     }) \
     AST_TYPE(decl_stmt, "declaration", { \
-        ast_base base; \
-        da(AST) lhs; \
-        AST rhs; \
-        AST type; \
-        bool has_expl_type : 1; /*FIXME: REMOVE THIS*/\ 
+        AstBase base; \
+        da(Ast) lhs; \
+        Ast rhs; \
+        Ast type; \
         bool is_mut        : 1; \
-        bool is_static     : 1; \
-        bool is_volatile   : 1; \
-        bool is_uninit     : 1; \
     }) \
     AST_TYPE(type_decl_stmt, "type declaration", { \
-        ast_base base; \
-        AST lhs; \
-        AST rhs; \
+        AstBase base; \
+        Ast lhs; \
+        Ast rhs; \
     }) \
     AST_TYPE(assign_stmt, "assignment", { \
-        ast_base base; \
-        da(AST) lhs; \
-        AST rhs; \
+        AstBase base; \
+        da(Ast) lhs; \
+        Ast rhs; \
     }) \
     AST_TYPE(comp_assign_stmt, "compound assignment", { \
-        ast_base base; \
-        AST lhs; \
-        AST rhs; \
+        AstBase base; \
+        Ast lhs; \
+        Ast rhs; \
         Token* op; \
     }) \
     AST_TYPE(if_stmt, "if statement", { \
-        ast_base base; \
-        AST condition; \
-        AST if_branch; \
-        AST else_branch; \
+        AstBase base; \
+        Ast condition; \
+        Ast if_branch; \
+        Ast else_branch; \
         bool is_elif : 1; \
     }) \
     AST_TYPE(switch_stmt, "switch statement", { \
-        ast_base base; \
-        AST expr; \
-        da(AST) cases; \
+        AstBase base; \
+        Ast expr; \
+        da(Ast) cases; \
     }) \
     AST_TYPE(case, "case statement", { \
-        ast_base base; \
-        da(AST) matches; \
-        AST block; \
+        AstBase base; \
+        da(Ast) matches; \
+        Ast block; \
     }) \
     AST_TYPE(while_stmt, "while loop", { \
-        ast_base base; \
-        AST condition; \
-        AST block; \
+        AstBase base; \
+        Ast condition; \
+        Ast block; \
     }) \
     AST_TYPE(for_stmt, "for loop", { \
-        ast_base base; \
-        AST prelude; \
-        AST condition; \
-        AST update; \
-        AST block; \
-    }) \
-    AST_TYPE(for_in_stmt, "for-in loop", { \
-        ast_base base; \
-        AST indexvar; \
-        AST type; \
-        AST to; \
-        AST from; \
-        AST block; \
-        bool is_inclusive; \
-        bool is_reverse; \
+        AstBase base; \
+        Ast pattern; \
+        Ast block; \
     }) \
     AST_TYPE(extern_stmt, "extern statement", { \
-        ast_base base; \
-        AST decl; \
+        AstBase base; \
+        Ast decl; \
     }) \
     AST_TYPE(defer_stmt, "defer statement", { \
-        ast_base base; \
-        AST stmt; \
+        AstBase base; \
+        Ast stmt; \
     }) \
     AST_TYPE(expr_stmt, "expression statement", { \
-        ast_base base; \
-        AST expression; \
+        AstBase base; \
+        Ast expression; \
     }) \
     AST_TYPE(return_stmt, "return statement", { \
-        ast_base base; \
-        da(AST) returns; \
+        AstBase base; \
+        da(Ast) returns; \
     }) \
     AST_TYPE(break_stmt, "break statement", { \
-        ast_base base; \
-        AST label; \
+        AstBase base; \
+        Ast label; \
     }) \
     AST_TYPE(continue_stmt, "continue statement", { \
-        ast_base base; \
-        AST label; \
+        AstBase base; \
+        Ast label; \
     }) \
     AST_TYPE(fallthrough_stmt, "fallthrough statement", { \
-        ast_base base; \
+        AstBase base; \
     }) \
     AST_TYPE(empty_stmt, "empty statement", { \
         union{ \
-        ast_base base; \
+        AstBase base; \
         Token* tok; \
         }; \
     }) \
     AST_TYPE(label_stmt, "label", { \
-        ast_base base; \
-        AST label; \
+        AstBase base; \
+        Ast label; \
     }) \
     \
     \
@@ -227,99 +228,101 @@ typedef struct {
     \
     AST_TYPE(basic_type_expr, "basic type literal", { \
         union { \
-            ast_base base; \
+            AstBase base; \
             Token* lit; \
         }; \
     }) \
     AST_TYPE(struct_type_expr, "struct type", { \
-            ast_base base; \
+            AstBase base; \
             da(AST_typed_field) fields; \
             bool smart_pack : 1;\
     }) \
     AST_TYPE(union_type_expr, "union type", { \
-            ast_base base; \
+            AstBase base; \
             da(AST_typed_field) fields; \
     }) \
     AST_TYPE(fn_type_expr, "fn type", { \
-            ast_base base; \
+            AstBase base; \
             da(AST_typed_field) parameters; \
-            da(AST_typed_field) returns; \
-            AST block_symbol_override; /*this will be a string literal or NULL_STR if not set*/ \
-            bool always_inline : 1;\
+            Ast block_symbol_override; /*this will be a string literal or NULL_STR if not set*/ \
+            union { \
+                da(AST_typed_field) returns; \
+                Ast single_return; \
+            }; \
             bool simple_return : 1; \
     }) \
     AST_TYPE(enum_type_expr, "enum type", { \
-            ast_base base; \
-            AST backing_type;\
+            AstBase base; \
+            Ast backing_type;\
             da(AST_enum_variant) variants; \
     }) \
     AST_TYPE(array_type_expr, "array type", { \
-            ast_base base; \
-            AST subexpr; \
-            AST length; \
+            AstBase base; \
+            Ast subexpr; \
+            Ast length; \
     }) \
     AST_TYPE(slice_type_expr, "slice type", { \
-            ast_base base; \
-            AST subexpr; \
+            AstBase base; \
+            Ast subexpr; \
             bool mutable : 1; \
     }) \
     AST_TYPE(pointer_type_expr, "pointer type", { \
-            ast_base base; \
-            AST subexpr; \
+            AstBase base; \
+            Ast subexpr; \
             bool mutable : 1; \
     }) \
     AST_TYPE(distinct_type_expr, "distinct type", { \
-            ast_base base; \
-            AST subexpr; \
+            AstBase base; \
+            Ast subexpr; \
     }) \
 
 
-// generate the enum tags for the AST tagged union
+// generate the enum tags for the Ast tagged union
 typedef u16 ast_type; enum {
     AST_invalid,
-#define AST_TYPE(ident, identstr, structdef) AST_##ident,
+#define AST_TYPE(ident, enumident, structdef) AST_##ident,
     AST_NODES
 #undef AST_TYPE
     AST_COUNT,
 };
 
-// generate tagged union AST type
-typedef struct AST {
+// generate tagged union Ast type
+typedef struct Ast {
     union {
         void* rawptr;
-        ast_base * restrict base;
-#define AST_TYPE(ident, identstr, structdef) struct ast_##ident * restrict as_##ident;
+        AstBase * restrict base;
+#define AST_TYPE(ident, enumident, structdef) struct ast_##ident * restrict as_##ident;
         AST_NODES
 #undef AST_TYPE
     };
     ast_type type;
-} AST;
+} Ast;
 
 typedef struct {
-    AST field;
-    AST type; // may be NULL_AST if the type is the same as the next field
+    Ast field;
+    Ast type; // may be NULL_AST if the type is the same as the next field
 } AST_typed_field;
 
 
 typedef struct {
-    AST ident;
+    Ast ident;
     i64 value;
 } AST_enum_variant;
 
-da_typedef(AST);
+da_typedef(Ast);
 da_typedef(AST_enum_variant);
 da_typedef(AST_typed_field);
 
-// generate AST node typedefs
-#define AST_TYPE(ident, identstr, structdef) typedef struct ast_##ident structdef ast_##ident;
+// generate Ast node typedefs
+#define AST_TYPE(ident, enumident, structdef) typedef struct ast_##ident structdef ast_##ident;
     AST_NODES
 #undef AST_TYPE
 
-#define NULL_AST ((AST){0})
+#define NULL_AST ((Ast){0})
 #define is_null_AST(node) ((node).type == 0 || (node).rawptr == NULL)
 
 extern char* ast_type_str[];
 extern const size_t ast_type_size[];
 
-AST new_ast_node(arena* alloca, ast_type type);
-void dump_tree(AST node, int n);
+Ast new_ast_node(arena* alloca, ast_type type);
+void dump_tree(Ast node, int n);
