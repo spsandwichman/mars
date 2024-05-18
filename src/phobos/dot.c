@@ -46,6 +46,8 @@ int dot_uID() {
 void recurse_dot(AST node, fs_file* file, int n, int uid) {
 	//this code keeps track of depth with n, in which case it prints that many tabs.
 	//all nodes have label sugar to allow them to change names to un-mutated names.
+	TODO("");
+
 	for (int i = 0; i < n; i++) fs_write(file, "\t", 1);
 
 	char buffer[4096];
@@ -59,7 +61,7 @@ void recurse_dot(AST node, fs_file* file, int n, int uid) {
 		return;
 	}
 
-	
+	/* commenting this out because it needs to redone anyway and i dont feel like fixing it fpr the new system
 	switch (node.type) {
 		case AST_invalid:
 			return;
@@ -968,6 +970,7 @@ void recurse_dot(AST node, fs_file* file, int n, int uid) {
 		}
 
 	}
+	*/
 
 	fs_write(file, "\n", 1);
 }

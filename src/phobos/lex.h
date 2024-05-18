@@ -137,7 +137,7 @@
 \
     TOKEN(TOK_META_COUNT, "") \
 
-typedef u8 token_type; enum {
+enum {
 #define TOKEN(enum, str) enum,
 TOKEN_LIST
 #undef TOKEN
@@ -145,21 +145,27 @@ TOKEN_LIST
 
 extern char* token_type_str[];
 
-typedef struct token_s {
-    string text;
-    token_type type;
-} token;
+typedef struct Token {
+    char* raw;
+    u32   len;
+    u8 type;
+} Token;
 
-da_typedef(token);
 
-typedef struct lexer_s {
+da_typedef(Token);
+
+typedef struct Lexer {
     string src;
     string path;
-    da(token) buffer;
+    da(Token) buffer;
     u64 cursor;
     char current_char;
-} lexer;
+} Lexer;
 
-lexer new_lexer(string path, string src);
-void construct_token_buffer(lexer* lex);
-void append_next_token(lexer* lex);
+Lexer new_lexer(string path, string src);
+void construct_token_buffer(Lexer* lex);
+void append_next_token(Lexer* lex);
+bool token_eq(Token* t, string text);
+
+#define tok2str(tok) ((string){.len = (tok).len, .raw = (tok).raw})
+#define tokptr2str(tok) ((string){.len = (tok)->len, .raw = (tok)->raw})

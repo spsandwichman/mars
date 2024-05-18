@@ -7,7 +7,7 @@
 // sandwichman's BLAZINGLY 🔥🔥 FAST 🚀🚀 parser in RUST 🦀🦀 + AI POWERED with ChatGPT 5.0 🤖🧠 and BLOCKCHAIN NFT ETHEREUM WEB3 TECHNOLOGY
 
 // construct a parser struct from a lexer and an arena allocator
-parser make_parser(lexer* l, arena* alloca) {
+parser make_parser(Lexer* l, arena* alloca) {
     parser p = {0};
     p.alloca = alloca;
     p.tokens = l->buffer;
@@ -55,7 +55,7 @@ void parse_file(parser* p) {
     }
 }
 
-int op_precedence(token_type type) {
+int op_precedence(u8 type) {
     switch (type) {
     case TOK_MUL:
     case TOK_DIV:
@@ -250,7 +250,7 @@ int ascii_to_digit_val(parser* p, char c, u8 base) {
 }
 
 i64 char_lit_value(parser* p) {
-    string t = current_token.text;
+    string t = tok2str(current_token);
 
     if (t.raw[1] != '\\') { // trivial case
         if (t.len > 3) error_at_parser(p, "char literal too long");
@@ -291,7 +291,7 @@ i64 char_lit_value(parser* p) {
 }
 
 f64 float_lit_value(parser* p) {
-    string t = current_token.text;
+    string t = tok2str(current_token);
     f64 val = 0;
 
     int digit_start = 0;
@@ -333,7 +333,7 @@ f64 float_lit_value(parser* p) {
 }
 
 i64 int_lit_value(parser* p) {
-    string t = current_token.text;
+    string t = tok2str(current_token);
     i64 val = 0;
 
     bool is_negative = false;
@@ -381,7 +381,7 @@ i64 int_lit_value(parser* p) {
 }
 
 string string_lit_value(parser* p) {
-    string t = current_token.text;
+    string t = tok2str(current_token);
     string val = NULL_STR;
     size_t val_len = 0;
 
@@ -476,7 +476,7 @@ bool is_possible_type_expr(AST n) {
 
 #define is_definitely_not_type_expr_trust_me_bro(ast_node) (!is_possible_type_expr((ast_node)))
 
-void parse_typed_field_list(parser* p, da(AST_typed_field)* list, token_type ending) {
+void parse_typed_field_list(parser* p, da(AST_typed_field)* list, u8 ending) {
     while (current_token.type != ending) {
 
         AST field = parse_expr(p, true);
@@ -564,7 +564,7 @@ AST parse_atomic_expr(parser* p, bool no_cl) {
             n.as_literal_expr->base.end = &current_token;
 
             n.as_literal_expr->value.kind = EV_BOOL;
-            n.as_literal_expr->value.as_bool = string_eq(current_token.text, str("true"));
+            n.as_literal_expr->value.as_bool = token_eq(&current_token, str("true"));
             n.as_literal_expr->value.freeable = false;
 
             advance_token;
@@ -914,11 +914,11 @@ AST parse_atomic_expr(parser* p, bool no_cl) {
                 if (current_token.type != TOK_IDENTIFIER)
                     error_at_parser(p, "expected an identifer");
 
-                if (string_eq(current_token.text, str("smart_pack"))) {
+                if (token_eq(&current_token, str("smart_pack"))) {
                     n.as_struct_type_expr->smart_pack = true;
                     advance_token;
                 } else {
-                    error_at_parser(p, "unrecognized directive '"str_fmt"'", str_arg(current_token.text));
+                    error_at_parser(p, "unrecognized directive '"str_fmt"'", str_arg(current_token));
                 }
             }
 
@@ -1057,7 +1057,7 @@ AST parse_atomic_expr(parser* p, bool no_cl) {
                 if (current_token.type != TOK_IDENTIFIER)
                     error_at_parser(p, "expected an identifer");
 
-                if (string_eq(current_token.text, str("block_symbol"))) {
+                if (token_eq(&current_token, str("block_symbol"))) {
                     advance_token;
                     if (current_token.type != TOK_OPEN_PAREN)
                         error_at_parser(p, "expected '('");
@@ -1071,7 +1071,7 @@ AST parse_atomic_expr(parser* p, bool no_cl) {
                     if (current_token.type != TOK_CLOSE_PAREN)
                         error_at_parser(p, "expected ')'");
                     advance_token;
-                } else if (string_eq(current_token.text, str("always_inline"))) {
+                } else if (token_eq(&current_token, str("always_inline"))) {
                     advance_token;
                     n.as_fn_type_expr->always_inline = true;
                 }
@@ -1311,11 +1311,11 @@ AST parse_stmt(parser* p) {
             // catch #reverse
             if (current_token.type == TOK_HASH) {
                 advance_token;
-                if (string_eq(current_token.text, str("reverse"))) {
+                if (token_eq(&current_token, str("reverse"))) {
                     n.as_for_in_stmt->is_reverse = true;
                     advance_token;
                 } else {
-                    error_at_parser(p, "invalid directive \'"str_fmt"\' in for-in loop", current_token.text);
+                    error_at_parser(p, "invalid directive \'"str_fmt"\' in for-in loop", str_arg(current_token));
                 }
             }
 
@@ -1444,12 +1444,12 @@ AST parse_stmt(parser* p) {
         // maybe directives?
         if (current_token.type == TOK_HASH) {
             advance_token;
-            if (string_eq(current_token.text, str("static"))) {
+            if (token_eq(&current_token, str("static"))) {
                 n.as_decl_stmt->is_static = true;
-            } else if (string_eq(current_token.text, str("volatile"))) {
+            } else if (token_eq(&current_token, str("volatile"))) {
                 n.as_decl_stmt->is_volatile = true;
             } else {
-                error_at_parser(p, "invalid directive \'%s\' in declaration", clone_to_cstring(current_token.text));
+                error_at_parser(p, "invalid directive \'"str_fmt"\' in declaration", str_arg(current_token));
             }
         }
 

@@ -226,10 +226,10 @@ void check_ident_expr(mars_module* mod, entity_table* et, AST expr, checked_expr
     ast_identifier_expr* ident = expr.as_identifier_expr;
 
     if (ident->is_discard) error_at_node(mod, expr, "_ cannot be used in expression");
-    if (!ident->entity) ident->entity = search_for_entity(et, ident->tok->text);
+    if (!ident->entity) ident->entity = search_for_entity(et, tokptr2str(ident->tok));
     entity* ent = ident->entity;
 
-    if (ent == NULL) error_at_node(mod, expr, "'"str_fmt"' undefined", str_arg(ident->tok->text));
+    if (ent == NULL) error_at_node(mod, expr, "'"str_fmt"' undefined", tokptr2str(ident->tok));
 
     if (must_comptime_const && ent->visited) {
         error_at_node(mod, expr, "constant expression has cyclic dependencies");
@@ -577,7 +577,7 @@ type* type_from_expr(mars_module* mod, entity_table* et, AST expr, bool no_error
                 current_type = type_from_expr(mod, et, ast_fn->parameters.at[i].type, false, true);
             }
             fn->as_function.params.at[i].subtype = current_type;
-            fn->as_function.params.at[i].name = ast_fn->parameters.at[i].field.as_identifier_expr->tok->text; // bruh
+            fn->as_function.params.at[i].name = tokptr2str(ast_fn->parameters.at[i].field.as_identifier_expr->tok); // bruh
         }
 
         // parse returns in
@@ -595,7 +595,7 @@ type* type_from_expr(mars_module* mod, entity_table* et, AST expr, bool no_error
                     current_type = type_from_expr(mod, et, ast_fn->parameters.at[i].type, false, true);
                 }
                 fn->as_function.params.at[i].subtype = current_type;
-                fn->as_function.params.at[i].name = ast_fn->parameters.at[i].field.as_identifier_expr->tok->text; // bruh
+                fn->as_function.params.at[i].name = tokptr2str(ast_fn->parameters.at[i].field.as_identifier_expr->tok); // bruh
             }
         }
 
@@ -639,16 +639,16 @@ type* type_from_expr(mars_module* mod, entity_table* et, AST expr, bool no_error
         return distinct;
     } break;
     case AST_identifier_expr: { // T
-        entity* ent = search_for_entity(et, expr.as_identifier_expr->tok->text);
+        entity* ent = search_for_entity(et, tokptr2str(expr.as_identifier_expr->tok));
         if (ent == NULL) {
-            error_at_node(mod, expr, "'"str_fmt"' undefined", str_arg(expr.as_identifier_expr->tok->text));
+            error_at_node(mod, expr, "'"str_fmt"' undefined", str_arg(*expr.as_identifier_expr->tok));
         }
 
         if (!ent->checked) check_stmt(mod, global_et(et), NULL, ent->decl, true); // on-the-fly global checking
 
         if (!ent->is_type) {
             if (no_error) return NULL;
-            else error_at_node(mod, expr, "'"str_fmt"' is not a type", str_arg(expr.as_identifier_expr->tok->text));
+            else error_at_node(mod, expr, "'"str_fmt"' is not a type", str_arg(*expr.as_identifier_expr->tok));
         }
         return ent->entity_type;
     } break;

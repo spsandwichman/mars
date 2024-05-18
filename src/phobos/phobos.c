@@ -84,7 +84,7 @@ mars_module* parse_module(string input_path) {
 
     change_cwd(clone_to_cstring(input_path));
 
-    da(lexer) lexers;
+    da(Lexer) lexers;
     da_init(&lexers, subfile_count);
 
     int mars_file_count = 0;
@@ -117,7 +117,7 @@ mars_module* parse_module(string input_path) {
             general_error("cannot read from \""str_fmt"\"", str_arg(subfiles[i].path));
 
 
-        lexer this_lexer = new_lexer(subfiles[i].path, loaded_file);
+        Lexer this_lexer = new_lexer(subfiles[i].path, loaded_file);
 
         da_append(&lexers, this_lexer);
 
@@ -254,14 +254,14 @@ mars_module* create_module(da(parser)* pl, arena alloca) {
 
     mod->AST_alloca = alloca;
 
-    mod->module_name = pl->at[0].module_decl.as_module_decl->name->text;
+    mod->module_name = tokptr2str(pl->at[0].module_decl.as_module_decl->name);
 
     da_init(&mod->import_list, 1);
 
     da_init(&mod->files, pl->len);
     for_urange(i, 0, pl->len) {
-        if (!string_eq(pl->at[i].module_decl.as_module_decl->name->text, mod->module_name)) {
-            error_at_string(pl->at[i].path, pl->at[i].src, pl->at[i].module_decl.as_module_decl->name->text,
+        if (!token_eq(pl->at[i].module_decl.as_module_decl->name, mod->module_name)) {
+            error_at_string(pl->at[i].path, pl->at[i].src, tokptr2str(pl->at[i].module_decl.as_module_decl->name),
                 "mismatched module name, expected '"str_fmt"'", str_arg(mod->module_name));
         }
 
@@ -272,7 +272,7 @@ mars_module* create_module(da(parser)* pl, arena alloca) {
     }
 
     if (string_eq(mod->module_name, str("mars")))
-        error_at_string(pl->at[0].path, pl->at[0].src, pl->at[0].module_decl.as_module_decl->name->text,
+        error_at_string(pl->at[0].path, pl->at[0].src, tokptr2str(pl->at[0].module_decl.as_module_decl->name),
             "module name 'mars' is reserved");
 
     // stitch ASTs together

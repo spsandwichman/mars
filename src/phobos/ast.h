@@ -8,8 +8,8 @@
 #include "type.h"
 
 typedef struct {
-    token* start;
-    token* end;
+    Token* start;
+    Token* end;
     // type* T; /* tentatively deleting this, it may be useful in the future but not now */
 } ast_base;
 
@@ -18,7 +18,7 @@ typedef struct {
     AST_TYPE(identifier_expr, "identifier", { \
         union { \
         ast_base base; \
-        token* tok; \
+        Token* tok; \
         }; \
         struct entity* entity; \
         bool is_discard : 1; \
@@ -55,12 +55,12 @@ typedef struct {
     }) \
     AST_TYPE(unary_op_expr, "unary op", { \
         ast_base base; \
-        token* op; \
+        Token* op; \
         AST inside; \
     }) \
     AST_TYPE(binary_op_expr, "binary op", { \
         ast_base base; \
-        token* op; \
+        Token* op; \
         AST lhs; \
         AST rhs; \
     }) \
@@ -105,7 +105,7 @@ typedef struct {
     \
     AST_TYPE(module_decl, "module declaration", { \
         ast_base base; \
-        token* name; \
+        Token* name; \
     }) \
     AST_TYPE(import_stmt, "import statement", { \
         ast_base base; \
@@ -143,7 +143,7 @@ typedef struct {
         ast_base base; \
         AST lhs; \
         AST rhs; \
-        token* op; \
+        Token* op; \
     }) \
     AST_TYPE(if_stmt, "if statement", { \
         ast_base base; \
@@ -214,7 +214,7 @@ typedef struct {
     AST_TYPE(empty_stmt, "empty statement", { \
         union{ \
         ast_base base; \
-        token* tok; \
+        Token* tok; \
         }; \
     }) \
     AST_TYPE(label_stmt, "label", { \
@@ -228,7 +228,7 @@ typedef struct {
     AST_TYPE(basic_type_expr, "basic type literal", { \
         union { \
             ast_base base; \
-            token* lit; \
+            Token* lit; \
         }; \
     }) \
     AST_TYPE(struct_type_expr, "struct type", { \

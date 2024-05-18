@@ -17,15 +17,14 @@
 #define advance_char_n(lex, n) (lex->cursor + (n) < lex->src.len ? (lex->current_char = lex->src.raw[lex->cursor += (n)]) : '\0')
 #define peek_char(lex, n) ((lex->cursor + (n)) < lex->src.len ? lex->src.raw[lex->cursor + (n)] : '\0')
 
+int skip_block_comment(Lexer* lex);
+void skip_until_char(Lexer* lex, char c);
+void skip_whitespace(Lexer* lex);
 
-int skip_block_comment(lexer* lex);
-void skip_until_char(lexer* lex, char c);
-void skip_whitespace(lexer* lex);
-
-token_type scan_ident_or_keyword(lexer* lex);
-token_type scan_number(lexer* lex);
-token_type scan_string_or_char(lexer* lex);
-token_type scan_operator(lexer* lex);
+u8 scan_ident_or_keyword(Lexer* lex);
+u8 scan_number(Lexer* lex);
+u8 scan_string_or_char(Lexer* lex);
+u8 scan_operator(Lexer* lex);
 
 char* token_type_str[] = {
 #define TOKEN(enum, str) str,
@@ -33,8 +32,16 @@ char* token_type_str[] = {
 #undef TOKEN
 };
 
-lexer new_lexer(string path, string src) {
-    lexer lex = {0};
+bool token_eq(Token* t, string text) {
+    if (t->len != text.len) return false;
+    for_range(i, 0, text.len) {
+        if (t->raw[i] != text.raw[i]) return false;
+    }
+    return true;
+}
+
+Lexer new_lexer(string path, string src) {
+    Lexer lex = {0};
     lex.path = path;
     lex.src = src;
     lex.current_char = src.raw[0];
@@ -43,9 +50,9 @@ lexer new_lexer(string path, string src) {
     return lex;
 }
 
-void construct_token_buffer(lexer* lex) {
+void construct_token_buffer(Lexer* lex) {
     if (lex == NULL || is_null_str(lex->src) || is_null_str(lex->path))
-        CRASH("bad lexer provided to construct_token_buffer");
+        CRASH("bad Lexer provided to construct_token_buffer");
 
     do {
         append_next_token(lex);
@@ -54,9 +61,9 @@ void construct_token_buffer(lexer* lex) {
     da_shrink(&lex->buffer);
 }
 
-void append_next_token(lexer* lex) {
+void append_next_token(Lexer* lex) {
 
-    // if the top token is an EOF, early return
+    // if the top Token is an EOF, early return
     // if (lex->buffer.at[lex->buffer.len-1].type == TOK_EOF) {
     //     return;
     // }
@@ -93,14 +100,14 @@ void append_next_token(lexer* lex) {
 
     if (lex->cursor >= lex->src.len) {
         da_append(
-            &lex->buffer, 
-            ((token){substring_len(lex->src, lex->cursor, 1), TOK_EOF})
+            &lex->buffer,
+            ((Token){lex->src.raw + lex->cursor, 1, TOK_EOF})
         );
         return;
     }
 
     u64 beginning_cursor = lex->cursor;
-    token_type this_type;
+    u8 this_type;
     if (can_start_identifier(current_char(lex))) {
         this_type = scan_ident_or_keyword(lex);
     } else if (can_start_number(current_char(lex))) {
@@ -111,13 +118,14 @@ void append_next_token(lexer* lex) {
         this_type = scan_operator(lex);
     }
 
-    da_append(&lex->buffer, ((token){
-        .text = substring(lex->src, beginning_cursor, lex->cursor), 
-        .type = this_type,
+    da_append(&lex->buffer, ((Token){
+        lex->src.raw + beginning_cursor, 
+        lex->cursor - beginning_cursor, 
+        this_type,
     }));
 }
 
-token_type scan_ident_or_keyword(lexer* lex) {
+u8 scan_ident_or_keyword(Lexer* lex) {
     u64 beginning = lex->cursor;
     
     advance_char(lex);
@@ -183,7 +191,7 @@ token_type scan_ident_or_keyword(lexer* lex) {
     return TOK_IDENTIFIER;
 }
 
-token_type scan_number(lexer* lex) {
+u8 scan_number(Lexer* lex) {
     advance_char(lex);
     while (true) {
         if (current_char(lex) == '.') {
@@ -210,7 +218,7 @@ token_type scan_number(lexer* lex) {
         advance_char(lex);
     }
 }
-token_type scan_string_or_char(lexer* lex) {
+u8 scan_string_or_char(Lexer* lex) {
     char quote_char = current_char(lex);
     u64  start_cursor = lex->cursor;
 
@@ -230,7 +238,7 @@ token_type scan_string_or_char(lexer* lex) {
         advance_char(lex);
     }
 }
-token_type scan_operator(lexer* lex) {
+u8 scan_operator(Lexer* lex) {
     switch (current_char(lex)) {
     case '+':
         advance_char(lex);
@@ -411,7 +419,7 @@ token_type scan_operator(lexer* lex) {
     return TOK_INVALID;
 }
 
-int skip_block_comment(lexer* lex) {
+int skip_block_comment(Lexer* lex) {
     int level = 1;
     while (level != 0) {
         if (lex->cursor >= lex->src.len) {
@@ -430,13 +438,13 @@ int skip_block_comment(lexer* lex) {
     return level;
 }
 
-void skip_until_char(lexer* lex, char c) {
+void skip_until_char(Lexer* lex, char c) {
     while (current_char(lex) != c && lex->cursor < lex->src.len) {
         advance_char(lex);
     }
 }
 
-void skip_whitespace(lexer* lex) {
+void skip_whitespace(Lexer* lex) {
     while (true) {
         char r = current_char(lex);
         if ((r != ' ' && r != '\t' && r != '\n' && r != '\r' && r != '\v') || lex->cursor >= lex->src.len) {

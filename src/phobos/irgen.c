@@ -29,7 +29,7 @@ IR_Global* ir_generate_global_from_stmt_decl(IR_Module* mod, AST ast) { //FIXME:
     //note: global decl_stmts are single entries on the lhs, so we can just assume that lhs[0] == ast_identifier_expr
 
     IR_Global* ir_g = ir_new_global(mod, NULL, /*global=*/true, /*read_only=*/decl_stmt->is_mut);
-    ir_g->sym->name = decl_stmt->lhs.at[0].as_identifier_expr->tok->text; 
+    ir_g->sym->name = tokptr2str(decl_stmt->lhs.at[0].as_identifier_expr->tok); 
 
     if (decl_stmt->rhs.type == AST_func_literal_expr) {
         IR_Function* fn = ir_generate_function(mod, decl_stmt->rhs);

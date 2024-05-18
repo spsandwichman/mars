@@ -6,7 +6,7 @@
 #include "parse.h"
 #include "ast.h"
 
-da_typedef(lexer);
+da_typedef(Lexer);
 da_typedef(parser);
 
 typedef struct {

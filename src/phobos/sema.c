@@ -45,7 +45,7 @@ void collect_decl(mars_module* mod, entity_table* et, AST stmt) {
             ast_identifier_expr* ident_expr = decl->lhs.at[j].as_identifier_expr;
             if (ident_expr->is_discard) continue;
 
-            string ident = ident_expr->tok->text;
+            string ident = tokptr2str(ident_expr->tok);
             entity* e = search_for_entity(et, ident);
             if (e == NULL) {
                 e = new_entity(et, ident, stmt);
@@ -64,7 +64,7 @@ void collect_decl(mars_module* mod, entity_table* et, AST stmt) {
         ast_identifier_expr* ident_expr = decl->lhs.as_identifier_expr;
         if (ident_expr->is_discard) return;
 
-        string ident = ident_expr->tok->text;
+        string ident = tokptr2str(ident_expr->tok);
         entity* e = search_for_entity(et, ident);
         if (e == NULL) {
             e = new_entity(et, ident, stmt);
@@ -119,7 +119,7 @@ void collect_entites(mars_module* restrict mod, entity_table* restrict et, da(AS
 
             ast_import_stmt* import = stmts.at[i].as_import_stmt;
 
-            string ident = import->name.as_identifier_expr->tok->text;
+            string ident = tokptr2str(import->name.as_identifier_expr->tok);
             entity* e = search_for_entity(et, ident);
             if (e == NULL) {
                 e = new_entity(et, ident, stmts.at[i]);

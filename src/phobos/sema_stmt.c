@@ -35,7 +35,7 @@ void check_decl_stmt(mars_module* mod, entity_table* et, ast_func_literal_expr* 
     }
 
     assert(decl->lhs.at[0].type == AST_identifier_expr);
-    string ident = decl->lhs.at[0].as_identifier_expr->tok->text;
+    string ident = tokptr2str(decl->lhs.at[0].as_identifier_expr->tok);
     
     entity* e = new_entity(et, ident, stmt);
     e->is_mutable = decl->is_mut;

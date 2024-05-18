@@ -53,7 +53,7 @@ void dump_tree(AST node, int n) {
         printf("[invalid]\n");
         break;
     case AST_identifier_expr:
-        printf("ident '%s'\n", clone_to_cstring(node.as_identifier_expr->tok->text));
+        printf("ident '"str_fmt"'\n", str_arg(*node.as_identifier_expr->tok));
         break;
     case AST_literal_expr:
         switch (node.as_literal_expr->value.kind) {
@@ -130,7 +130,7 @@ void dump_tree(AST node, int n) {
         }
         break;
     case AST_module_decl:
-        printf("module %s\n", clone_to_cstring(node.as_module_decl->name->text));
+        printf("module "str_fmt"\n", str_arg(*node.as_module_decl->name));
         break;
     case AST_import_stmt:
         printf("import\n");
@@ -179,7 +179,7 @@ void dump_tree(AST node, int n) {
         dump_tree(node.as_enum_type_expr->backing_type, n+1);
         for_urange(i, 0, node.as_enum_type_expr->variants.len) {
             print_indent(n+1);
-            printstr((node.as_enum_type_expr->variants.at[i].ident.as_identifier_expr->tok->text)); 
+            printf(str_fmt, str_arg(*node.as_enum_type_expr->variants.at[i].ident.as_identifier_expr->tok)); 
             
             printf(" = %ld\n", node.as_enum_type_expr->variants.at[i].value);
         }
@@ -193,8 +193,7 @@ void dump_tree(AST node, int n) {
         dump_tree(node.as_slice_type_expr->subexpr, n+1);
         break;
     case AST_basic_type_expr:
-        printstr(node.as_basic_type_expr->lit->text);
-        printf("\n");
+        printf(str_fmt"\n", str_arg(*node.as_basic_type_expr->lit));
         break;
 
     case AST_func_literal_expr:

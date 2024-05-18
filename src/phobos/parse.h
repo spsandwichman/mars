@@ -8,7 +8,7 @@
 
 typedef struct parser {
     arena* alloca;
-    da(token) tokens;
+    da(Token) tokens;
     string path;
     string src;
     size_t current_tok;
@@ -20,7 +20,7 @@ typedef struct parser {
 
 } parser;
 
-parser make_parser(lexer* l, arena* alloca);
+parser make_parser(Lexer* l, arena* alloca);
 void parse_file(parser* p);
 
 #define new_ast_node_p(p, type) ((p)->num_nodes++, new_ast_node((p)->alloca, (type)))
@@ -43,18 +43,18 @@ AST parse_atomic_expr   (parser* p, bool no_tcl);
 #define advance_token (((p)->current_tok + 1 < (p)->tokens.len) ? ((p)->current_tok)++ : 0)
 #define advance_n_tok(n) (((p)->current_tok + n < (p)->tokens.len) ? ((p)->current_tok)+=n : 0)
 
-#define str_from_tokens(start, end) ((string){(start).text.raw, (end).text.raw - (start).text.raw + (end).text.len})
+#define str_from_tokens(start, end) ((string){(start).raw, (end).raw - (start).raw + (end).len})
 
 #define error_at_parser(p, message, ...) \
-    error_at_string((p)->path, (p)->src, current_token.text, \
+    error_at_string((p)->path, (p)->src, tok2str(current_token), \
     message __VA_OPT__(,) __VA_ARGS__)
 
 #define error_at_token_index(p, index, message, ...) \
     error_at_string((p)->path, (p)->src, (p)->tokens.at[index].text, \
     message __VA_OPT__(,) __VA_ARGS__)
 
-#define error_at_token(p, token, message, ...) \
-    error_at_string((p)->path, (p)->src, (token).text, \
+#define error_at_token(p, t, message, ...) \
+    error_at_string((p)->path, (p)->src, tok2str((t)), \
     message __VA_OPT__(,) __VA_ARGS__)
 
 #define error_at_AST(p, node, message, ...) \
