@@ -1,0 +1,8 @@
+mars compiler source code style guidelines:
+    - use spaces, 4 spaces per level of indentation.
+    - type names use PascalCase.
+    - function and variable names use snake_case.
+    - constants and enums use SCREAMING_CASE.
+    - macros can either follow SCREAMING_CASE or snake_case, left to the author's discretion.
+    - `#pragma once` instead of `#ifdef` guards.
+    - large C files should have a corresponding header that defines types and public entities.

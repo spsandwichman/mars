@@ -13,7 +13,7 @@ typedef struct entity_table entity_table;
 
 typedef struct Entity {
     string identifier;
-    AST decl; // If it's NULL_AST, it hasn't been declared yet.
+    Ast decl; // If it's NULL_AST, it hasn't been declared yet.
 
     union {
         type* entity_type;
@@ -40,7 +40,6 @@ typedef struct Entity {
     bool is_module     : 1;
     bool is_extern     : 1;
     bool is_used       : 1;
-    bool is_pointed_to : 1; // does its pointer ever get taken?
 
     bool checked : 1;
     bool visited : 1; // for cyclic dependency checking
@@ -63,9 +62,7 @@ typedef struct entity_table {
 
 extern entity_table_list entity_tables;
 
-u64 FNV_1a(string key); // for implementing a hash table later
-
 entity_table* new_entity_table(entity_table* parent);
 
 Entity* search_for_entity(entity_table* et, string ident);
-Entity* new_entity(entity_table* et, string ident, AST decl);
+Entity* new_entity(entity_table* et, string ident, Ast decl);

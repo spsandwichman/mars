@@ -115,138 +115,45 @@ typedef struct {
     })\
     AST_TYPE(RangedForPattern, RANGED_FOR_PATTERN, { \
         AstBase base; \
-        Ast index; \
+        AstIdentTypePair var; /* should be IDENT_TYPE_PAIR*/ \
         Ast range; \
+    })\
+    AST_TYPE(IdentTypePair, IDENT_TYPE_PAIR, { \
+        AstBase base; \
+        Ast ident; \
+        Ast type; /* can be null */ \
+    })\
+    AST_TYPE(EnumVariantItem, ENUM_VARIANT_ITEM, {\
+        AstBase base; \
+        Ast ident;\
+        Ast value; /* can be null */ \
     })\
     \
     \
-    AST_TYPE(module_decl, "module declaration", { \
-        AstBase base; \
-        Token* name; \
-    }) \
-    AST_TYPE(import_stmt, "import statement", { \
-        AstBase base; \
-        Ast name; \
-        Ast path; \
-        \
-        string realpath; \
-    }) \
-    AST_TYPE(block_stmt, "statement block", { \
-        AstBase base; \
-        da(Ast) stmts; \
-    }) \
-    AST_TYPE(decl_stmt, "declaration", { \
-        AstBase base; \
-        da(Ast) lhs; \
-        Ast rhs; \
-        Ast type; \
-        bool is_mut        : 1; \
-    }) \
-    AST_TYPE(type_decl_stmt, "type declaration", { \
-        AstBase base; \
-        Ast lhs; \
-        Ast rhs; \
-    }) \
-    AST_TYPE(assign_stmt, "assignment", { \
-        AstBase base; \
-        da(Ast) lhs; \
-        Ast rhs; \
-    }) \
-    AST_TYPE(comp_assign_stmt, "compound assignment", { \
-        AstBase base; \
-        Ast lhs; \
-        Ast rhs; \
-        Token* op; \
-    }) \
-    AST_TYPE(if_stmt, "if statement", { \
-        AstBase base; \
-        Ast condition; \
-        Ast if_branch; \
-        Ast else_branch; \
-        bool is_elif : 1; \
-    }) \
-    AST_TYPE(switch_stmt, "switch statement", { \
-        AstBase base; \
-        Ast expr; \
-        da(Ast) cases; \
-    }) \
-    AST_TYPE(case, "case statement", { \
-        AstBase base; \
-        da(Ast) matches; \
-        Ast block; \
-    }) \
-    AST_TYPE(while_stmt, "while loop", { \
-        AstBase base; \
-        Ast condition; \
-        Ast block; \
-    }) \
-    AST_TYPE(for_stmt, "for loop", { \
-        AstBase base; \
-        Ast pattern; \
-        Ast block; \
-    }) \
-    AST_TYPE(extern_stmt, "extern statement", { \
-        AstBase base; \
-        Ast decl; \
-    }) \
-    AST_TYPE(defer_stmt, "defer statement", { \
-        AstBase base; \
-        Ast stmt; \
-    }) \
-    AST_TYPE(expr_stmt, "expression statement", { \
-        AstBase base; \
-        Ast expression; \
-    }) \
-    AST_TYPE(return_stmt, "return statement", { \
-        AstBase base; \
-        da(Ast) returns; \
-    }) \
-    AST_TYPE(break_stmt, "break statement", { \
-        AstBase base; \
-        Ast label; \
-    }) \
-    AST_TYPE(continue_stmt, "continue statement", { \
-        AstBase base; \
-        Ast label; \
-    }) \
-    AST_TYPE(fallthrough_stmt, "fallthrough statement", { \
-        AstBase base; \
-    }) \
-    AST_TYPE(empty_stmt, "empty statement", { \
-        union{ \
-        AstBase base; \
-        Token* tok; \
-        }; \
-    }) \
-    AST_TYPE(label_stmt, "label", { \
-        AstBase base; \
-        Ast label; \
-    }) \
     \
     \
     \
     \
-    AST_TYPE(basic_type_expr, "basic type literal", { \
+    AST_TYPE(BasicType, BASIC_TYPE, { \
         union { \
             AstBase base; \
             Token* lit; \
         }; \
     }) \
-    AST_TYPE(struct_type_expr, "struct type", { \
+    AST_TYPE(StructType, STRUCT_TYPE, { \
             AstBase base; \
-            da(AST_typed_field) fields; \
-            bool smart_pack : 1;\
+            da(Ast) fields; \
     }) \
-    AST_TYPE(union_type_expr, "union type", { \
+    AST_TYPE(UnionType, UNION_TYPE, { \
             AstBase base; \
-            da(AST_typed_field) fields; \
+            da(Ast) fields; \
     }) \
-    AST_TYPE(fn_type_expr, "fn type", { \
+    AST_TYPE(FnType, FN_TYPE, { \
             AstBase base; \
-            da(AST_typed_field) parameters; \
+            da(Ast) parameters; \
             Ast block_symbol_override; /*this will be a string literal or NULL_STR if not set*/ \
             union { \
-                da(AST_typed_field) returns; \
+                da(Ast) returns; \
                 Ast single_return; \
             }; \
             bool simple_return : 1; \
@@ -254,7 +161,7 @@ typedef struct {
     AST_TYPE(enum_type_expr, "enum type", { \
             AstBase base; \
             Ast backing_type;\
-            da(AST_enum_variant) variants; \
+            da(Ast) variants; \
     }) \
     AST_TYPE(array_type_expr, "array type", { \
             AstBase base; \
@@ -290,31 +197,18 @@ typedef u16 ast_type; enum {
 typedef struct Ast {
     union {
         void* rawptr;
-        AstBase * restrict base;
-#define AST_TYPE(ident, enumident, structdef) struct ast_##ident * restrict as_##ident;
+        AstBase * base;
+#define AST_TYPE(ident, enumident, structdef) struct Ast##ident * ident;
         AST_NODES
 #undef AST_TYPE
     };
     ast_type type;
 } Ast;
 
-typedef struct {
-    Ast field;
-    Ast type; // may be NULL_AST if the type is the same as the next field
-} AST_typed_field;
-
-
-typedef struct {
-    Ast ident;
-    i64 value;
-} AST_enum_variant;
-
 da_typedef(Ast);
-da_typedef(AST_enum_variant);
-da_typedef(AST_typed_field);
 
 // generate Ast node typedefs
-#define AST_TYPE(ident, enumident, structdef) typedef struct ast_##ident structdef ast_##ident;
+#define AST_TYPE(ident, enumident, structdef) typedef struct Ast##ident structdef Ast##ident;
     AST_NODES
 #undef AST_TYPE
 

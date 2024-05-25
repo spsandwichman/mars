@@ -3,18 +3,6 @@
 
 entity_table_list entity_tables;
 
-u64 FNV_1a(string key) {
-    const u64 FNV_OFFSET = 14695981039346656037ull;
-    const u64 FNV_PRIME  = 1099511628211ull;
-
-    u64 hash = FNV_OFFSET;
-    for_urange(i, 0, key.len) {
-        hash ^= (u64)(u8)(key.raw[i]);
-        hash *= FNV_PRIME;
-    }
-    return hash;
-}
-
 entity_table* new_entity_table(entity_table* parent) {
     entity_table* et = malloc(sizeof(entity_table));
     *et = (entity_table){0};
@@ -41,7 +29,7 @@ Entity* search_for_entity(entity_table* et, string ident) {
     return search_for_entity(et->parent, ident);
 }
 
-Entity* new_entity(entity_table* et, string ident, AST decl) {
+Entity* new_entity(entity_table* et, string ident, Ast decl) {
     Entity* e = arena_alloc(&et->alloca, sizeof(Entity), alignof(Entity));
     *e = (Entity){0};
     e->identifier = ident;
