@@ -8,6 +8,6 @@
 
 char* random_string(int len);
 
-IR_Module* ir_generate(mars_module* mod);
+IR_Module* ir_generate(MarsModule* mod);
 
-void deimos_run(mars_module* main_mod);
+void deimos_run(MarsModule* main_mod);

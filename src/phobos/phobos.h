@@ -17,36 +17,36 @@ typedef struct {
 da_typedef(mars_file);
 
 typedef struct {
-    struct mars_module ** at;
+    struct MarsModule ** at;
     size_t len;
     size_t cap;
 } module_list;
 
-typedef struct mars_module {
+typedef struct MarsModule {
     string module_name;
     string module_path;
     da(mars_file) files;
     module_list import_list;
 
-    da(AST) program_tree;
-    arena AST_alloca;
-    arena temp_alloca;
+    da(Ast) program_tree;
+    Arena AST_alloca;
+    Arena temp_alloca;
 
     bool visited : 1; // checking shit
     bool checked : 1; // has been FULLY CHECKED by the checker
-} mars_module;
+} MarsModule;
 
 typedef char* cstring;
 
 da_typedef(cstring);
 
 
-mars_module* parse_module(string input_path);
+MarsModule* parse_module(string input_path);
 
 // creates a compilation unit from a list of parsers.
 // stitches the unchecked ASTs together and such
-mars_module* create_module(da(parser)* pl, arena alloca);
+MarsModule* create_module(da(parser)* pl, Arena alloca);
 
 // find the source file of a snippet of code
 // NOTE: the snippet must be an actual substring (is_within() must return true) of one of the files
-mars_file* find_source_file(mars_module* cu, string snippet);
+mars_file* find_source_file(MarsModule* cu, string snippet);

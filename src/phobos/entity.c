@@ -1,11 +1,11 @@
 #include "entity.h"
 #include "../deimos/deimos.h" //bodge
 
-entity_table_list entity_tables;
+EntityTableList entity_tables;
 
-entity_table* new_entity_table(entity_table* parent) {
-    entity_table* et = malloc(sizeof(entity_table));
-    *et = (entity_table){0};
+EntityTable* new_entity_table(EntityTable* parent) {
+    EntityTable* et = mars_alloc(sizeof(EntityTable));
+    *et = (EntityTable){0};
 
     et->parent = parent;
     da_init(et, 1);
@@ -16,7 +16,7 @@ entity_table* new_entity_table(entity_table* parent) {
     return et;
 }
 
-Entity* search_for_entity(entity_table* et, string ident) {
+Entity* search_for_entity(EntityTable* et, string ident) {
     if (et == NULL) return NULL;
     
     // for now, its linear search bc im too lazy to impl a hashmap
@@ -29,7 +29,7 @@ Entity* search_for_entity(entity_table* et, string ident) {
     return search_for_entity(et->parent, ident);
 }
 
-Entity* new_entity(entity_table* et, string ident, Ast decl) {
+Entity* new_entity(EntityTable* et, string ident, Ast decl) {
     Entity* e = arena_alloc(&et->alloca, sizeof(Entity), alignof(Entity));
     *e = (Entity){0};
     e->identifier = ident;

@@ -168,7 +168,7 @@ typedef struct AsmModule {
     AsmFunction** functions;
     u32 functions_len;
 
-    arena alloca;
+    Arena alloca;
 } AsmModule;
 
 /* TARGET DEFINITIONS AND INFORMATION */

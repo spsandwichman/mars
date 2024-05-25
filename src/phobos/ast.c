@@ -21,12 +21,12 @@ char* ast_type_str[] = {
     "COUNT",
 };
 
-// allocate and zero a new AST node with an arena
-AST new_ast_node(arena* alloca, ast_type type) {
-    AST node;
+// allocate and zero a new Ast node with an arena
+Ast new_ast_node(Arena* alloca, ast_type type) {
+    Ast node;
     void* node_ptr = arena_alloc(alloca, ast_type_size[type], 8);
     if (node_ptr == NULL) {
-        general_error("internal: new_ast_node_p() could not allocate AST node of type '%s' with size %d", ast_type_str[type], ast_type_size[type]);
+        general_error("internal: new_ast_node_p() could not allocate Ast node of type '%s' with size %d", ast_type_str[type], ast_type_size[type]);
     }
     memset(node_ptr, 0, ast_type_size[type]);
     node.rawptr = node_ptr;
@@ -39,17 +39,17 @@ void print_indent(int n) {
 }
 
 // FOR DEBUGGING PURPOSES!! THIS IS NOT GOING TO BE MEMORY SAFE LMFAO
-void dump_tree(AST node, int n) {
+void dump_tree(Ast node, int n) {
 
     print_indent(n);
 
     if (is_null_AST(node)) {
-        printf("[null AST]\n");
+        printf("[null Ast]\n");
         return;
     }
 
     switch (node.type) {
-    case AST_invalid:
+    case AST_INVALID:
         printf("[invalid]\n");
         break;
     case AST_identifier_expr:

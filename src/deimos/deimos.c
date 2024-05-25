@@ -1,7 +1,7 @@
 #include "deimos.h"
 #include "passes/passes.h"
 
-void deimos_run(mars_module* main_mod) {
+void deimos_run(MarsModule* main_mod) {
     IR_Module* ir_mod = ir_generate(main_mod);
 
     register_passes();

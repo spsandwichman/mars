@@ -4,7 +4,7 @@
 #include "orbit.h"
 #include "arena.h"
 
-typedef struct exact_value exact_value;
+typedef struct ExactValue ExactValue;
 
 typedef u8 exact_value_kind; enum {
     EV_INVALID,
@@ -37,7 +37,7 @@ typedef u8 exact_value_kind; enum {
        will be known by the backend but isn't known by the frontend */
 };
 
-typedef struct exact_value {
+typedef struct ExactValue {
     union {
         bool    as_bool;
         string  as_string;
@@ -61,7 +61,7 @@ typedef struct exact_value {
         u64     as_pointer;
 
         struct {
-            exact_value** vals; // REMEMBER TO ALLOCATE! its not a DA so this is manual
+            ExactValue** vals; // REMEMBER TO ALLOCATE! its not a DA so this is manual
             u32 len;
         } as_aggregate;
     };
@@ -69,11 +69,11 @@ typedef struct exact_value {
     bool freeable : 1;
 
     bool aggregate_all_zero : 1;
-} exact_value;
+} ExactValue;
 
 #define NO_AGGREGATE (-1)
 #define USE_MALLOC ((void*)1)
 
-exact_value* alloc_exact_value(int aggregate_len, arena* alloca);
-void destroy_exact_value(exact_value* ev);
-exact_value* copy_ev_to_permanent(exact_value* ev);
+ExactValue* alloc_exact_value(int aggregate_len, Arena* alloca);
+void destroy_exact_value(ExactValue* ev);
+ExactValue* copy_ev_to_permanent(ExactValue* ev);

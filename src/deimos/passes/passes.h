@@ -4,7 +4,7 @@
 #include "deimos.h"
 #include "ir.h"
 
-IR_Module* ir_generate(mars_module* mod);
+IR_Module* ir_generate(MarsModule* mod);
 
 /* REQIRED PASSES
     canon           general cleanup & canonicalization

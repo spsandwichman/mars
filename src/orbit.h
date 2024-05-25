@@ -54,13 +54,13 @@ typedef uint8_t bool;
 #   define forceinline inline
 #endif
 
-#define TODO(msg) do {\
-    printf("\x1b[36m\x1b[1mTODO\x1b[0m \"%s\" in %s() at %s:%d\n", (msg), (__func__), (__FILE__), (__LINE__)); \
-    exit(EXIT_FAILURE); } while (0)
+#define TODO(msg, ...) do {\
+    printf("\x1b[36m\x1b[1mTODO\x1b[0m in %s() at %s:%d -> %s\n", (__func__), (__FILE__), (__LINE__), (msg) VA_OPT(,) __VA_ARGS__); \
+    exit(EXIT_FAILURE);} while (0)
 
-#define CRASH(msg) do { \
-    printf("\x1b[31m\x1b[1mCRASH\x1b[0m \"%s\" in %s() at %s:%d\n", (msg), (__func__), (__FILE__), (__LINE__)); \
-    exit(EXIT_FAILURE); } while (0)
+#define CRASH(msg, ...) do {\
+    printf("\x1b[31m\x1b[1mCRASH\x1b[0m in %s() at %s:%d -> %s\n", (__func__), (__FILE__), (__LINE__), (msg) VA_OPT(,) __VA_ARGS__); \
+    exit(EXIT_FAILURE);} while (0)
 
 
 #define UNREACHABLE do { \

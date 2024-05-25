@@ -2,9 +2,9 @@
 #include "phobos/sema.h"
 #include "irgen.h"
 
-static mars_module* mars_mod;
+static MarsModule* mars_mod;
 
-IR_Module* ir_generate(mars_module* mod) {
+IR_Module* ir_generate(MarsModule* mod) {
     IR_Module* m = ir_new_module(mod->module_name);
     mars_mod = mod;
     
@@ -14,14 +14,14 @@ IR_Module* ir_generate(mars_module* mod) {
         if (mod->program_tree.at[i].type == AST_decl_stmt) {
             ir_generate_global_from_stmt_decl(m, mod->program_tree.at[i]);
         } else {
-            general_error("FIXME: unhandled AST root");
+            general_error("FIXME: unhandled Ast root");
         }
     }
 
     return m;
 }
 
-IR_Global* ir_generate_global_from_stmt_decl(IR_Module* mod, AST ast) { //FIXME: add sanity
+IR_Global* ir_generate_global_from_stmt_decl(IR_Module* mod, Ast ast) { //FIXME: add sanity
     ast_decl_stmt* decl_stmt = ast.as_decl_stmt; 
 
     //note: CAE problem, we update the IR_Symbol name after IR_Global creation
@@ -43,7 +43,7 @@ IR_Global* ir_generate_global_from_stmt_decl(IR_Module* mod, AST ast) { //FIXME:
 
 //FIXME: add ir_generate_local_from_stmt_decl
 
-IR* ir_generate_expr_literal(IR_Function* f, IR_BasicBlock* bb, AST ast) {
+IR* ir_generate_expr_literal(IR_Function* f, IR_BasicBlock* bb, Ast ast) {
     ast_literal_expr* literal = ast.as_literal_expr;
     IR_Const* ir = (IR_Const*) ir_make_const(f);
     
@@ -61,7 +61,7 @@ IR* ir_generate_expr_literal(IR_Function* f, IR_BasicBlock* bb, AST ast) {
     return (IR*) ir;
 }
 
-IR* ir_generate_expr_binop(IR_Function* f, IR_BasicBlock* bb, AST ast) {
+IR* ir_generate_expr_binop(IR_Function* f, IR_BasicBlock* bb, Ast ast) {
     ast_binary_op_expr* binop = ast.as_binary_op_expr;
 
     IR* lhs = ir_generate_expr_value(f, bb, binop->lhs);
@@ -83,7 +83,7 @@ IR* ir_generate_expr_binop(IR_Function* f, IR_BasicBlock* bb, AST ast) {
     return ir;
 }
 
-IR* ir_generate_expr_ident_load(IR_Function* f, IR_BasicBlock* bb, AST ast) {
+IR* ir_generate_expr_ident_load(IR_Function* f, IR_BasicBlock* bb, Ast ast) {
     ast_identifier_expr* ident = ast.as_identifier_expr;
     if (ident->is_discard) return ir_add(bb, ir_make(f, IR_INVALID));
 
@@ -107,7 +107,7 @@ IR* ir_generate_expr_ident_load(IR_Function* f, IR_BasicBlock* bb, AST ast) {
     return ir_add(bb, load);
 }
 
-IR* ir_generate_expr_value(IR_Function* f, IR_BasicBlock* bb, AST ast) {
+IR* ir_generate_expr_value(IR_Function* f, IR_BasicBlock* bb, Ast ast) {
 
     switch (ast.type) {
     case AST_literal_expr:    return ir_generate_expr_literal(f, bb, ast);
@@ -115,13 +115,13 @@ IR* ir_generate_expr_value(IR_Function* f, IR_BasicBlock* bb, AST ast) {
     case AST_identifier_expr: return ir_generate_expr_ident_load(f, bb, ast);
     case AST_paren_expr:      return ir_generate_expr_value(f, bb, ast.as_paren_expr->subexpr);
     default:
-        warning_at_node(mars_mod, ast, "unhandled AST type");
-        CRASH("unhandled AST type");
+        warning_at_node(mars_mod, ast, "unhandled Ast type");
+        CRASH("unhandled Ast type");
         break;
     }
 }
 
-IR* ir_generate_expr_address(IR_Function* f, IR_BasicBlock* bb, AST ast) {
+IR* ir_generate_expr_address(IR_Function* f, IR_BasicBlock* bb, Ast ast) {
     switch (ast.type) {
     case AST_identifier_expr:
         if (ast.as_identifier_expr->entity->stackalloc != NULL) {
@@ -136,12 +136,12 @@ IR* ir_generate_expr_address(IR_Function* f, IR_BasicBlock* bb, AST ast) {
         }
         break;
     default:
-        warning_at_node(mars_mod, ast, "unhandled AST type");
-        CRASH("unhandled AST type");
+        warning_at_node(mars_mod, ast, "unhandled Ast type");
+        CRASH("unhandled Ast type");
     }
 }
 
-void ir_generate_stmt_assign(IR_Function* f, IR_BasicBlock* bb, AST ast) {
+void ir_generate_stmt_assign(IR_Function* f, IR_BasicBlock* bb, Ast ast) {
     ast_assign_stmt* assign = ast.as_assign_stmt;
 
     if (assign->lhs.len == 1) {
@@ -165,7 +165,7 @@ void ir_generate_stmt_assign(IR_Function* f, IR_BasicBlock* bb, AST ast) {
     }
 }
 
-void ir_generate_stmt_return(IR_Function* f, IR_BasicBlock* bb, AST ast) {
+void ir_generate_stmt_return(IR_Function* f, IR_BasicBlock* bb, Ast ast) {
     ast_return_stmt* astret = ast.as_return_stmt;
     
     // if its a plain return, we need to get the 
@@ -192,7 +192,7 @@ void ir_generate_stmt_return(IR_Function* f, IR_BasicBlock* bb, AST ast) {
     ret->T = make_type(TYPE_NONE);
 }
 
-IR_Function* ir_generate_function(IR_Module* mod, AST ast) {
+IR_Function* ir_generate_function(IR_Module* mod, Ast ast) {
     if (ast.type != AST_func_literal_expr) CRASH("ast type is not func literal");
     ast_func_literal_expr* astfunc = ast.as_func_literal_expr;
 

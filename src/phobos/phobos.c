@@ -40,7 +40,7 @@ void change_cwd(char* dir) {
 /*tune this probably*/
 #define PARSER_ARENA_SIZE 0x100000
 
-string search_for_module(mars_module* mod, string relpath) {
+string search_for_module(MarsModule* mod, string relpath) {
     // search locally first
     change_cwd(clone_to_cstring(mod->module_path));
     if (fs_exists(relpath)) {
@@ -62,7 +62,7 @@ string search_for_module(mars_module* mod, string relpath) {
 
 }
 
-mars_module* parse_module(string input_path) {
+MarsModule* parse_module(string input_path) {
 
     // path checks
     if (!fs_exists(input_path))
@@ -151,7 +151,7 @@ mars_module* parse_module(string input_path) {
     da(parser) parsers;
     da_init(&parsers, lexers.len);
 
-    arena alloca = arena_make(PARSER_ARENA_SIZE);
+    Arena alloca = arena_make(PARSER_ARENA_SIZE);
 
     for_urange(i, 0, lexers.len) {
         
@@ -170,7 +170,7 @@ mars_module* parse_module(string input_path) {
         ast_nodes_created += parsers.at[i].num_nodes;
     }
 
-    mars_module* module = create_module(&parsers, alloca);
+    MarsModule* module = create_module(&parsers, alloca);
     module->module_path = input_path;
     module->visited = true;
 
@@ -187,7 +187,7 @@ mars_module* parse_module(string input_path) {
         double elapsed = (double) seconds + (double) microseconds*1e-6;
         printf(STYLE_FG_Blue STYLE_Bold "PARSING" STYLE_Reset);
         printf("\t  time      : %fs\n", elapsed);
-        printf("\t  AST nodes : %zu\n", ast_nodes_created);
+        printf("\t  Ast nodes : %zu\n", ast_nodes_created);
         printf("\t  nodes/s   : %.3f\n", (double) ast_nodes_created / elapsed);
     }
 
@@ -220,7 +220,7 @@ mars_module* parse_module(string input_path) {
                 da_append(&module->import_list, active_modules.at[found_imported_module]);
             } else {
                 // parse new module
-                mars_module* import_module = parse_module(importpath);
+                MarsModule* import_module = parse_module(importpath);
                 da_append(&module->import_list, import_module);
 
                 // check module name conflicts
@@ -245,11 +245,11 @@ mars_module* parse_module(string input_path) {
     return module;
 }
 
-mars_module* create_module(da(parser)* pl, arena alloca) {
+MarsModule* create_module(da(parser)* pl, Arena alloca) {
     if (pl == NULL) CRASH("build_module() provided with null parser list pointer");
     if (pl->len == 0) CRASH("build_module() provided with parser list of length 0");
 
-    mars_module* mod = malloc(sizeof(mars_module));
+    MarsModule* mod = malloc(sizeof(MarsModule));
     if (mod == NULL) CRASH("build_module() module alloc failed");
 
     mod->AST_alloca = alloca;
@@ -286,7 +286,7 @@ mars_module* create_module(da(parser)* pl, arena alloca) {
     return mod;
 }
 
-mars_file *find_source_file(mars_module* cu, string snippet) {
+mars_file *find_source_file(MarsModule* cu, string snippet) {
     for_urange(i, 0, cu->files.len) {
         if (is_within(cu->files.at[i].src, snippet)) {
             return &cu->files.at[i];

@@ -7,33 +7,33 @@
 #include "arena.h"
 
 typedef struct parser {
-    arena* alloca;
+    Arena* alloca;
     da(Token) tokens;
     string path;
     string src;
     size_t current_tok;
 
-    AST    module_decl;
-    da(AST) stmts;
+    Ast    module_decl;
+    da(Ast) stmts;
 
     size_t num_nodes;
 
 } parser;
 
-parser make_parser(Lexer* l, arena* alloca);
+parser make_parser(Lexer* l, Arena* alloca);
 void parse_file(parser* p);
 
 #define new_ast_node_p(p, type) ((p)->num_nodes++, new_ast_node((p)->alloca, (type)))
 
-AST parse_module_decl(parser* p);
-AST parse_stmt       (parser* p);
-AST parse_block_stmt (parser* p);
-AST parse_elif       (parser* p);
+Ast parse_module_decl(parser* p);
+Ast parse_stmt       (parser* p);
+Ast parse_block_stmt (parser* p);
+Ast parse_elif       (parser* p);
 
-AST parse_binary_expr   (parser* p, int precedence, bool no_tcl);
-AST parse_non_unary_expr(parser* p, AST lhs, int precedence, bool no_tcl);
-AST parse_unary_expr    (parser* p, bool no_tcl);
-AST parse_atomic_expr   (parser* p, bool no_tcl);
+Ast parse_binary_expr   (parser* p, int precedence, bool no_tcl);
+Ast parse_non_unary_expr(parser* p, Ast lhs, int precedence, bool no_tcl);
+Ast parse_unary_expr    (parser* p, bool no_tcl);
+Ast parse_atomic_expr   (parser* p, bool no_tcl);
 
 #define parse_type_expr(p) (parse_unary_expr((p), true))
 #define parse_expr(p, no_cl) (parse_binary_expr(p, 0, no_cl))

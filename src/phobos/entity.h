@@ -8,8 +8,8 @@
 #include "type.h"
 
 typedef struct Entity Entity;
-typedef struct entity_table_list entity_table_list;
-typedef struct entity_table entity_table;
+typedef struct EntityTableList EntityTableList;
+typedef struct EntityTable EntityTable;
 
 typedef struct Entity {
     string identifier;
@@ -17,14 +17,11 @@ typedef struct Entity {
 
     union {
         type* entity_type;
-        mars_module* module;
+        MarsModule* module;
     };
 
-    exact_value* const_val;
-    entity_table* top; // scope in which it is declared
-
-    // filled out by checker
-    struct IR* stackalloc;
+    ExactValue* const_val;
+    EntityTable* top; // scope in which it is declared
 
     union {
         u16 param_idx;
@@ -45,24 +42,24 @@ typedef struct Entity {
     bool visited : 1; // for cyclic dependency checking
 } Entity;
 
-typedef struct entity_table_list {
-    entity_table** at;
+typedef struct EntityTableList {
+    EntityTable** at;
     size_t len;
     size_t cap;
-} entity_table_list;
+} EntityTableList;
 
-typedef struct entity_table {
-    entity_table* parent;
-    arena alloca;
+typedef struct EntityTable {
+    EntityTable* parent;
+    Arena alloca;
 
     Entity** at;
     size_t len;
     size_t cap;
-} entity_table;
+} EntityTable;
 
-extern entity_table_list entity_tables;
+extern EntityTableList entity_tables;
 
-entity_table* new_entity_table(entity_table* parent);
+EntityTable* new_entity_table(EntityTable* parent);
 
-Entity* search_for_entity(entity_table* et, string ident);
-Entity* new_entity(entity_table* et, string ident, Ast decl);
+Entity* search_for_entity(EntityTable* et, string ident);
+Entity* new_entity(EntityTable* et, string ident, Ast decl);

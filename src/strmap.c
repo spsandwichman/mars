@@ -42,7 +42,7 @@ void strmap_put(StrMap* sm, string key, void* val) {
     // search for nearby free slot
     for (size_t i = (hash_index + 1) % sm->cap; i != hash_index; i++) {
         if (i >= sm->cap) i = 0;
-        if ((sm->keys[i] == NULL) || (strcmp(sm->keys[i], key) == 0)) {
+        if ((sm->keys[i].raw == NULL) || (string_eq(sm->keys[i], key))) {
             sm->keys[i] = key;
             sm->vals[i] = val;
             return;
@@ -71,27 +71,27 @@ void* strmap_get(StrMap* sm, string key) {
     size_t hash_index = hashfunc(key) % sm->cap;
 
     // key found in first slot
-    if (strcmp(sm->keys[hash_index], key) == 0) {
+    if (string_eq(sm->keys[hash_index], key)) {
         return sm->vals[hash_index];
     }
 
     // linear search next slots
     for (size_t i = hash_index + 1; i != hash_index; i++) {
         if (i >= sm->cap) i = 0;
-        if (sm->keys[i] == NULL) return STRMAP_NOT_FOUND;
-        if (strcmp(sm->keys[i], key) == 0) return sm->vals[i];
+        if (sm->keys[i].raw == NULL) return STRMAP_NOT_FOUND;
+        if (string_eq(sm->keys[i], key)) return sm->vals[i];
     }
 
     return STRMAP_NOT_FOUND;
 }
 
 void strmap_remove(StrMap* sm, string key) {
-    if (!key) return;
+    if (!key.raw) return;
     size_t hash_index = hashfunc(key) % sm->cap;
 
     // key found in first slot
-    if (strcmp(sm->keys[hash_index], key) == 0) {
-        sm->keys[hash_index] = NULL;
+    if (string_eq(sm->keys[hash_index], key)) {
+        sm->keys[hash_index] = NULL_STR;
         sm->vals[hash_index] = NULL;
         return;
     }
@@ -99,9 +99,9 @@ void strmap_remove(StrMap* sm, string key) {
     // linear search next slots
     for (size_t i = hash_index + 1; i != hash_index; i++) {
         if (i >= sm->cap) i = 0;
-        if (sm->keys[i] == NULL) return;
-        if (strcmp(sm->keys[i], key) == 0) {
-            sm->keys[hash_index] = NULL;
+        if (sm->keys[i].raw == NULL) return;
+        if (string_eq(sm->keys[i], key)) {
+            sm->keys[hash_index] = NULL_STR;
             sm->vals[hash_index] = NULL;
             return;
         }

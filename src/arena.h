@@ -9,21 +9,21 @@ typedef struct {
     void* raw;
     u32 offset;
     u32 size;
-} arena_block;
+} ArenaBlock;
 
-arena_block arena_block_make(size_t size);
-void  arena_block_delete(arena_block* a);
-void* arena_block_alloc(arena_block* a, size_t size, size_t align);
+da_typedef(ArenaBlock);
 
-da_typedef(arena_block);
-
-typedef struct arena {
-    da(arena_block) list;
+typedef struct Arena {
+    da(ArenaBlock) list;
     u32 arena_size;
-} arena;
+} Arena;
 
-arena arena_make(size_t size);
-void  arena_delete(arena* al);
-void* arena_alloc(arena* al, size_t size, size_t align);
+ArenaBlock arena_block_make(size_t size);
+void  arena_block_delete(ArenaBlock* a);
+void* arena_block_alloc(ArenaBlock* a, size_t size, size_t align);
+
+Arena arena_make(size_t size);
+void  arena_delete(Arena* al);
+void* arena_alloc(Arena* al, size_t size, size_t align);
 
 size_t align_forward(size_t ptr, size_t align);

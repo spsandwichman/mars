@@ -86,7 +86,7 @@ typedef struct IR_Function {
     u32 entry_idx; // 0 most of the time, but not guaranteed
     // u32 exit_idx;
 
-    arena alloca;
+    Arena alloca;
 } IR_Function;
 
 typedef struct IR_FuncItem {
