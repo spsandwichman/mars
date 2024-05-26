@@ -20,7 +20,6 @@ char* ast_type_str[] = {
 #undef AST_TYPE
     "COUNT",
 };
-
 // allocate and zero a new Ast node with an arena
 Ast new_ast_node(Arena* alloca, ast_type type) {
     Ast node;

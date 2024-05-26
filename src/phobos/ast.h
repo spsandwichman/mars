@@ -102,7 +102,15 @@ typedef struct {
         AstBase base; \
         Ast lhs; \
         da(Ast) params; \
-        bool force_inline; \
+    }) \
+    AST_TYPE(AssignExpr, ASSIGN_EXPR, { \
+        AstBase base; \
+        union {\
+            da(Ast) list; \
+            Ast single; \
+        } lhs;\
+        Ast rhs; \
+        bool single : 1; \
     }) \
     AST_TYPE(RangeExpr, RANGE_EXPR, { \
         AstBase base; \
@@ -131,15 +139,19 @@ typedef struct {
     \
     \
     \
-    AST_TYPE(BlockStmt, BLOCK_STMT, {\
+    AST_TYPE(BlockExpr, BLOCK_EXPR, {\
         AstBase base; \
         da(Ast) stmts; \
     })\
     AST_TYPE(DeclStmt, DECL_STMT, {\
         AstBase base; \
         Ast ident; \
-        Ast type; \
-        Ast value; /* can be null */ \
+        Ast type; /* can be null */ \
+        Ast value; /* can also be null, but not at the same time as type */ \
+    })\
+    AST_TYPE(ExprStmt, EXPR_STMT, {\
+        AstBase base; \
+        Ast expr; \
     })\
     \
     \
@@ -230,4 +242,3 @@ extern char* ast_type_str[];
 extern const size_t ast_type_size[];
 
 Ast new_ast_node(Arena* alloca, ast_type type);
-void dump_tree(Ast node, int n);
