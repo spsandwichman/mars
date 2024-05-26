@@ -1,9 +1,6 @@
 #include "phobos.h"
 #include "parse.h"
 
-#define parse_type_expr(p) (parse_unary_expr((p), true))
-#define parse_expr(p, no_cl) (parse_binary_expr(p, 0, no_cl))
-
 #define current_token(p) ((p)->tokens.at[(p)->current])
 #define peek_token(p, n) ((p)->tokens.at[max((p)->current + (n), (p)->tokens.len)])
 #define advance_token(p) if ((p)->current < (p)->tokens.len) (p)->current++
@@ -12,6 +9,29 @@
     } while (0)
 
 void expect_token(Parser* p, u8 type) {
+    if (current_token(p).type == type) return;
 
-
+    CRASH("");
 }
+
+/*
+
+┌─┬─┐
+├─┼─┤
+│ │ │
+└─┴─┘
+╭╮
+╰╯
+
+*/
+
+/*
+
+
+     ╭─{code.mars}
+ 10  │ 
+     ┆
+ 102 │
+─────╯
+
+*/
