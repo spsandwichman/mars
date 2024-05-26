@@ -52,7 +52,7 @@ Lexer new_lexer(string path, string src) {
 
 void construct_token_buffer(Lexer* lex) {
     if (lex == NULL || is_null_str(lex->src) || is_null_str(lex->path))
-        CRASH("bad Lexer provided to construct_token_buffer");
+        CRASH("bad lexer provided to construct_token_buffer");
 
     do {
         append_next_token(lex);

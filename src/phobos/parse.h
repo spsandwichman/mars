@@ -6,42 +6,36 @@
 #include "ast.h"
 #include "arena.h"
 
-typedef struct parser {
+typedef struct Parser {
     Arena* alloca;
+
     da(Token) tokens;
     string path;
     string src;
-    size_t current_tok;
+
+    u64 current;
 
     Ast    module_decl;
     da(Ast) stmts;
 
     size_t num_nodes;
 
-} parser;
+} Parser;
 
-parser make_parser(Lexer* l, Arena* alloca);
-void parse_file(parser* p);
+Parser make_parser_from_lexer(Lexer* l, Arena* alloca);
+void parse_file(Parser* p);
 
 #define new_ast_node_p(p, type) ((p)->num_nodes++, new_ast_node((p)->alloca, (type)))
 
-Ast parse_module_decl(parser* p);
-Ast parse_stmt       (parser* p);
-Ast parse_block_stmt (parser* p);
-Ast parse_elif       (parser* p);
+Ast parse_module_decl(Parser* p);
+Ast parse_stmt       (Parser* p);
+Ast parse_block_stmt (Parser* p);
+Ast parse_elif       (Parser* p);
 
-Ast parse_binary_expr   (parser* p, int precedence, bool no_tcl);
-Ast parse_non_unary_expr(parser* p, Ast lhs, int precedence, bool no_tcl);
-Ast parse_unary_expr    (parser* p, bool no_tcl);
-Ast parse_atomic_expr   (parser* p, bool no_tcl);
-
-#define parse_type_expr(p) (parse_unary_expr((p), true))
-#define parse_expr(p, no_cl) (parse_binary_expr(p, 0, no_cl))
-
-#define current_token(p) ((p)->tokens.at[(p)->current_tok])
-#define peek_token(p, n) ((p)->tokens.at[(p)->current_tok + (n)])
-#define advance_token(p) (((p)->current_tok + 1 < (p)->tokens.len) ? ((p)->current_tok)++ : 0)
-#define advance_n_tok(p, n) (((p)->current_tok + n < (p)->tokens.len) ? ((p)->current_tok)+=n : 0)
+Ast parse_binary_expr   (Parser* p, int precedence, bool no_tcl);
+Ast parse_non_unary_expr(Parser* p, Ast lhs, int precedence, bool no_tcl);
+Ast parse_unary_expr    (Parser* p, bool no_tcl);
+Ast parse_atomic_expr   (Parser* p, bool no_tcl);
 
 #define str_from_tokens(start, end) ((string){(start).raw, (end).raw - (start).raw + (end).len})
 
